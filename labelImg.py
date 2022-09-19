@@ -104,7 +104,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.dirty = False
 
         self._no_selection_slot = False
-        self._beginner = True
+        self._beginner = False
         self.screencast = "https://youtu.be/p0nR2YsCY_U"
 
         # Load predefined classes to the list
@@ -127,7 +127,7 @@ class MainWindow(QMainWindow, WindowMixin):
 
         # Create a widget for using default label
         self.use_default_label_checkbox = QCheckBox(get_str('useDefaultLabel'))
-        self.use_default_label_checkbox.setChecked(False)
+        self.use_default_label_checkbox.setChecked(True)
         self.default_label_combo_box = DefaultLabelComboBox(self,items=self.label_hist)
 
         use_default_label_qhbox_layout = QHBoxLayout()
@@ -240,7 +240,7 @@ class MainWindow(QMainWindow, WindowMixin):
                         'space', 'verify', get_str('verifyImgDetail'))
 
         save = action(get_str('save'), self.save_file,
-                      'Ctrl+S', 'save', get_str('saveDetail'), enabled=False)
+                      's', 'save', get_str('saveDetail'), enabled=False)
 
         def get_format_meta(format):
             """
@@ -412,7 +412,7 @@ class MainWindow(QMainWindow, WindowMixin):
         # Auto saving : Enable auto saving if pressing next
         self.auto_saving = QAction(get_str('autoSaveMode'), self)
         self.auto_saving.setCheckable(True)
-        self.auto_saving.setChecked(settings.get(SETTING_AUTO_SAVE, False))
+        self.auto_saving.setChecked(settings.get(SETTING_AUTO_SAVE, True))
         # Sync single class mode from PR#106
         self.single_class_mode = QAction(get_str('singleClsMode'), self)
         self.single_class_mode.setShortcut("Ctrl+Shift+S")
@@ -448,15 +448,16 @@ class MainWindow(QMainWindow, WindowMixin):
             action('&Move here', self.move_shape)))
 
         self.tools = self.toolbar('Tools')
-        self.actions.beginner = (
-            open, open_dir, change_save_dir, open_next_image, open_prev_image, verify, save, save_format, None, create, copy, delete, None,
-            zoom_in, zoom, zoom_out, fit_window, fit_width, None,
-            light_brighten, light, light_darken, light_org)
 
-        self.actions.advanced = (
+        self.actions.beginner = (
             open, open_dir, change_save_dir, open_next_image, open_prev_image, save, save_format, None,
             create_mode, edit_mode, None,
             hide_all, show_all)
+
+        self.actions.advanced = (
+            open, open_dir, change_save_dir, open_next_image, open_prev_image, verify, save, save_format, None, create, copy, delete, None,
+            zoom_in, zoom, zoom_out, fit_window, fit_width, None,
+            light_brighten, light, light_darken, light_org)
 
         self.statusBar().showMessage('%s started.' % __appname__)
         self.statusBar().show()
@@ -1449,6 +1450,8 @@ class MainWindow(QMainWindow, WindowMixin):
 
         if filename:
             self.load_file(filename)
+
+        self.set_create_mode()
 
     def open_file(self, _value=False):
         if not self.may_continue():

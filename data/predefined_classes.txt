@@ -1,3 +1,4 @@
+car_plate
 dog
 person
 cat
